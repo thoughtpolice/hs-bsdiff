@@ -95,25 +95,25 @@ patch _old _patch
 -- and a new version. Does nothing to the patch before writing
 -- it to a file. Defined as:
 --
--- > bsdiff = bsdiff' id
+-- > bsdiff = bsdiff' (Just . id)
 --
 bsdiff :: FilePath -- ^ Old file
        -> FilePath -- ^ New file
        -> FilePath -- ^ Patch file to create
        -> IO ()
-bsdiff = bsdiff' id
+bsdiff = bsdiff' (Just . id)
 
 -- | Apply a patch file to an old version of a file, resulting
 -- in a new version. Does nothing to the patch before applying
 -- it. Defined as:
 --
--- > bspatch = bspatch' id
+-- > bspatch = bspatch' (Just . id)
 --
 bspatch :: FilePath -- ^ Old file
         -> FilePath -- ^ Patch file
         -> FilePath -- ^ New file to create from patch
         -> IO ()
-bspatch = bspatch' id
+bspatch = bspatch' (Just . id)
 
 
 -----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ bspatch = bspatch' id
 -- before it gets written to a file (for example, compress it.)
 --
 -- Ignores errors.
-bsdiff' :: (ByteString -> ByteString) -- ^ Transformation function
+bsdiff' :: (ByteString -> Maybe ByteString) -- ^ Transformation function
         -> FilePath -- ^ Old file
         -> FilePath -- ^ New file
         -> FilePath -- ^ Patch file to create
@@ -132,7 +132,7 @@ bsdiff' :: (ByteString -> ByteString) -- ^ Transformation function
 bsdiff' f old new pat = do
   o <- S.readFile old
   n <- S.readFile new
-  maybe (return ()) (S.writeFile pat . f) (diff o n)
+  maybe (return ()) (S.writeFile pat) (diff o n >>= f)
 
 -- | Apply a patch file to an old version of a file, resulting
 -- in a new version. You can also apply a function to the patch
@@ -140,7 +140,7 @@ bsdiff' f old new pat = do
 -- decompress it.)
 --
 -- Ignores errors.
-bspatch' :: (ByteString -> ByteString) -- ^ Transformation function
+bspatch' :: (ByteString -> Maybe ByteString) -- ^ Transformation function
          -> FilePath -- ^ Old file
          -> FilePath -- ^ Patch file
          -> FilePath -- ^ New file to create from patch
@@ -148,7 +148,7 @@ bspatch' :: (ByteString -> ByteString) -- ^ Transformation function
 bspatch' f old pat new = do
   o <- S.readFile old
   p <- S.readFile pat
-  maybe (return ()) (S.writeFile new . f) (patch o p)
+  maybe (return ()) (S.writeFile new) (f p >>= patch o)
 
 
 -----------------------------------------------------------------------------
