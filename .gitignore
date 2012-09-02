@@ -1,13 +1,9 @@
 *.o
 *.hi
 *~
-leveldb.buildinfo
-config.log
-config.status
-configure
-autom4te.cache
-examples/ffi_test
 examples/ex1
 /.hsenv*
 /dist*
 .sublime-*
+/src/cbits/*.out
+/src/cbits/*.o
