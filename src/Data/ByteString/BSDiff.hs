@@ -23,7 +23,9 @@ module Data.ByteString.BSDiff
        ) where
 
 import System.FilePath()
-import Data.ByteString
+
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as B
 
 -- | Creates a delta between two 'ByteString's. Can be applied
 -- to the old version using 'patch', resuling in the new version.
@@ -41,18 +43,25 @@ patch _old _patch = Nothing
 {-# INLINEABLE patch #-}
 
 -- | Create a patch file, based on an old version of a file
--- and a new version.
+-- and a new version. Ignores errors.
 bsdiff :: FilePath -- ^ Old file
        -> FilePath -- ^ New file
        -> FilePath -- ^ Patch file to create
        -> IO ()
-bsdiff _oldf _newf _patchf = return ()
+bsdiff _oldf _newf _patchf = do
+  old <- B.readFile _oldf
+  new <- B.readFile _newf
+  let r = diff old new
+  maybe (return ()) (B.writeFile _patchf) r
 
 -- | Apply a patch file to an old version of a file, resulting
--- in a new version.
+-- in a new version. Ignores errors.
 bspatch :: FilePath -- ^ Old file
         -> FilePath -- ^ Patch file
         -> FilePath -- ^ New file to create from patch
         -> IO ()
-bspatch _oldf _patchf _newf = return ()
-
+bspatch _oldf _patchf _newf = do
+  old <- B.readFile _oldf
+  pat <- B.readFile _patchf
+  let r = patch old pat
+  maybe (return ()) (B.writeFile _newf) r
