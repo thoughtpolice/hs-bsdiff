@@ -125,7 +125,7 @@ int bspatch(u_char* old,   ssize_t   oldsize,
       errx(1,"Corrupt patch\n");
 
     /* Read diff string */
-    memcpy(new+newpos, diffblock, ctrl[0]);
+    memcpy(new + newpos, diffblock, ctrl[0]);
     diffblock += ctrl[0];
 
     /* Add old data to diff string */
