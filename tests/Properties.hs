@@ -3,7 +3,6 @@ module Main
        ) where
 
 import Test.QuickCheck
-import Test.HUnit
 
 import Data.ByteString
 import Data.ByteString.BSDiff
