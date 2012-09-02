@@ -39,12 +39,7 @@ library
   build-depends:
     base         >= 4,
     bytestring,
-    filepath,
-    -- We depend on bzlib even though we don't use it;
-    -- this will either require a dependency on system bzlib,
-    -- or will build a copy for windows and install bzlib.h
-    -- as needed. No reason to duplicate that.
-    bzlib
+    filepath
 
   hs-source-dirs: src
   include-dirs:   src/cbits
