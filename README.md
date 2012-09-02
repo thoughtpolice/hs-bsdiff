@@ -5,11 +5,8 @@ software.
 
 These are the awesome Haskell bindings, based on bsdiff v4.3.
 
-Additionally, the `src/cbits` directory contains a refactoring of
-bsdiff into library form that is portable, ANSI C. It removes
-dependencies on bzip2, meaning you can add whatever compression you
-want. It should be useful outside of these bindings (e.g. for another
-programming language.)
+The `src/cbits` directory contains a copy of [minibsdiff](http://github.com/thoughtpolice/minibsdiff)
+which is the underlying API. You can reuse it however you like.
 
 [travis-ci.org](http://travis-ci.org) results: [![Build Status](https://secure.travis-ci.org/thoughtpolice/hs-bsdiff.png?branch=master)](http://travis-ci.org/thoughtpolice/hs-bsdiff)
 
