@@ -3,7 +3,13 @@
 [bsdiff][] is a tool for building and applying patches to binary
 software.
 
-These are the awesome Haskell bindings.
+These are the awesome Haskell bindings, based on bsdiff v4.3.
+
+Additionally, the `src/cbits` directory contains a refactoring of
+bsdiff into library form that is portable, ANSI C. It removes
+dependencies on bzip2, meaning you can add whatever compression you
+want. It should be useful outside of these bindings (e.g. for another
+programming language.)
 
 [travis-ci.org](http://travis-ci.org) results: [![Build Status](https://secure.travis-ci.org/thoughtpolice/hs-bsdiff.png?branch=master)](http://travis-ci.org/thoughtpolice/hs-bsdiff)
 
