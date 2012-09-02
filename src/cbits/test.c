@@ -28,11 +28,11 @@
 static void
 usage(const char* name)
 {
-    errx(1, "usage:\n\n"
-            "Generate patch:"
-            "\t$ %s gen <v1> <v2> <patch>\n"
-            "Apply patch:"
-            "\t$ %s app <v1> <patch> <v2>\n", name, name);
+  errx(1, "usage:\n\n"
+          "Generate patch:"
+          "\t$ %s gen <v1> <v2> <patch>\n"
+          "Apply patch:"
+          "\t$ %s app <v1> <patch> <v2>\n", name, name);
 }
 
 void
