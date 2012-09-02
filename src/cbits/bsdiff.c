@@ -32,7 +32,6 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c,v 1.1 2005/08/06 01:59:05
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <err.h>
 
 #include "bsdiff.h"
 
@@ -226,7 +225,7 @@ int bsdiff(u_char* old, off_t oldsize,
   /* Allocate oldsize+1 bytes instead of oldsize bytes to ensure
      that we never try to malloc(0) and get a NULL pointer */
   if(((I=malloc((oldsize+1)*sizeof(off_t)))==NULL) ||
-     ((V=malloc((oldsize+1)*sizeof(off_t)))==NULL)) err(1,NULL);
+     ((V=malloc((oldsize+1)*sizeof(off_t)))==NULL)) return -1;
 
   qsufsort(I,V,old,oldsize);
 
@@ -235,7 +234,7 @@ int bsdiff(u_char* old, off_t oldsize,
   /* Allocate newsize+1 bytes instead of newsize bytes to ensure
      that we never try to malloc(0) and get a NULL pointer */
   if(((db=malloc(newsize+1))==NULL) ||
-     ((eb=malloc(newsize+1))==NULL)) err(1,NULL);
+     ((eb=malloc(newsize+1))==NULL)) return -1;
   dblen=0;
   eblen=0;
 
@@ -332,13 +331,13 @@ int bsdiff(u_char* old, off_t oldsize,
   };
 
   /* Write size of ctrl data */
-  offtout(ctrllen-32, header + 8);
+  offtout(ctrllen, header + 8);
 
   /* Write diff data */
   memcpy(fileblock, db, dblen);
   fileblock += dblen;
   /* Write size of diff data */
-  offtout(dblen - len, header + 16);
+  offtout(dblen, header + 16);
 
   /* Write extra data */
   memcpy(fileblock, eb, eblen);
@@ -352,5 +351,5 @@ int bsdiff(u_char* old, off_t oldsize,
   free(eb);
   free(I);
 
-  return 0;
+  return (32+ctrllen+dblen+eblen);
 }

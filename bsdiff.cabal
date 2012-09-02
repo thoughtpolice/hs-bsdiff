@@ -47,6 +47,7 @@ library
     bzlib
 
   hs-source-dirs: src
+  include-dirs:   src/cbits
 
   c-sources:
     src/cbits/bsdiff.c

@@ -85,9 +85,9 @@ ssize_t bspatch_newsize(unsigned char* patch)
 
 int bspatch(u_char* old,   ssize_t   oldsize,
             u_char* patch, ssize_t patchsize,
-            u_char* new,   ssize_t   newsize)
+            u_char* new)
 {
-  ssize_t ctrllen,datalen;
+  ssize_t newsize,ctrllen,datalen;
   u_char *ctrlblock, *diffblock, *extrablock;
   off_t oldpos,newpos;
   off_t ctrl[3];
