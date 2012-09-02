@@ -103,9 +103,10 @@ diff(const char* oldf, const char* newf, const char* patchf)
   /* fwrite(old, 1, oldsz, stdout); */
   /* fwrite(new, 1, newsz, stdout); */
 
-  /* Allocate patch. Worst case should be the bigger of the two
-   * files, providing they're totally different (I hope.) */
-  patchsz = oldsz + newsz + 400; /* Just to be safe */
+  /* Allocate for size of patch. Worst case, the files are totally different,
+   * so we'll require new+old amount of space.
+   */
+  patchsz = oldsz + newsz + 1024; /* Just to be safe */
   patch = zmalloc(patchsz);
 
   /* Compute delta */
