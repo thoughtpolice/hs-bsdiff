@@ -105,7 +105,7 @@ diff(const char* oldf, const char* newf, const char* patchf)
 
   /* Allocate patch. Worst case should be the bigger of the two
    * files, providing they're totally different (I hope.) */
-  patchsz = max(oldsz, newsz)+400; /* Just to be safe */
+  patchsz = oldsz + newsz + 400; /* Just to be safe */
   patch = zmalloc(patchsz);
 
   /* Compute delta */
@@ -151,7 +151,7 @@ patch(const char* inf, const char* patchf, const char* outf)
 
   /* Apply delta */
   res = bspatch(inp, insz, patchp, patchsz, newp);
-  if (res <= 0) barf("bspatch() failed!");
+  if (res != 0) barf("bspatch() failed!");
 
   /* Write new file */
   write_file(outf, newp, newsz);
