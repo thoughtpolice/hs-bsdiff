@@ -21,6 +21,10 @@ module Data.ByteString.BSDiff
          -- * File interface
        , bsdiff   -- :: FilePath -> FilePath -> FilePath -> IO ()
        , bspatch  -- :: FilePath -> FilePath -> FilePath -> IO ()
+
+         -- * Extended file interface
+       , bsdiff'  -- :: (ByteString -> ByteString) -> FilePath -> FilePath -> FilePath -> IO ()
+       , bspatch' -- :: (ByteString -> ByteString) -> FilePath -> FilePath -> FilePath -> IO ()
        ) where
 
 import System.FilePath()
@@ -43,6 +47,10 @@ import qualified Data.ByteString.Unsafe as U
 #include <stdbool.h>
 #include <bsdiff.h>
 #include <bspatch.h>
+
+
+-----------------------------------------------------------------------------
+-- ByteString interface
 
 -- | Creates a delta between two 'ByteString's. Can be applied
 -- to the old version using 'patch', resuling in the new version.
@@ -78,39 +86,78 @@ patch _old _patch
              (void . c_bspatch oldp (fi olds) patchp (fi patchs))
 {-# INLINEABLE patch #-}
 
+
+-----------------------------------------------------------------------------
+-- File interface
+
 -- | Create a patch file, based on an old version of a file
--- and a new version. Ignores errors.
+-- and a new version. Does nothing to the patch before writing
+-- it to a file. Defined as:
+--
+-- > bsdiff = bsdiff' id
+--
 bsdiff :: FilePath -- ^ Old file
        -> FilePath -- ^ New file
        -> FilePath -- ^ Patch file to create
        -> IO ()
-bsdiff _oldf _newf _patchf = do
-  o <- S.readFile _oldf
-  n <- S.readFile _newf
-  maybe (return ()) (S.writeFile _patchf) (diff o n)
+bsdiff = bsdiff' id
 
 -- | Apply a patch file to an old version of a file, resulting
--- in a new version. Ignores errors.
+-- in a new version. Does nothing to the patch before applying
+-- it. Defined as:
+--
+-- > bspatch = bspatch' id
+--
 bspatch :: FilePath -- ^ Old file
         -> FilePath -- ^ Patch file
         -> FilePath -- ^ New file to create from patch
         -> IO ()
-bspatch _oldf _patchf _newf = do
-  o <- S.readFile _oldf
-  p <- S.readFile _patchf
-  maybe (return ()) (S.writeFile _newf) (patch o p)
+bspatch = bspatch' id
 
+-----------------------------------------------------------------------------
+-- Extended file interface
+
+-- | Create a patch file, based on an old version of a file
+-- and a new version. You can also apply a function to the patch
+-- before it gets written to a file (for example, compress it.)
 --
+-- Ignores errors.
+bsdiff' :: (ByteString -> ByteString) -- ^ Transformation function
+        -> FilePath -- ^ Old file
+        -> FilePath -- ^ New file
+        -> FilePath -- ^ Patch file to create
+        -> IO ()
+bsdiff' f old new pat = do
+  o <- S.readFile old
+  n <- S.readFile new
+  maybe (return ()) (S.writeFile pat . f) (diff o n)
+
+-- | Apply a patch file to an old version of a file, resulting
+-- in a new version. You can also apply a function to the patch
+-- after it is read from the file, and before it is applied (for example,
+-- decompress it.)
+--
+-- Ignores errors.
+bspatch' :: (ByteString -> ByteString) -- ^ Transformation function
+         -> FilePath -- ^ Old file
+         -> FilePath -- ^ Patch file
+         -> FilePath -- ^ New file to create from patch
+         -> IO ()
+bspatch' f old pat new = do
+  o <- S.readFile old
+  p <- S.readFile pat
+  maybe (return ()) (S.writeFile new . f) (patch o p)
+
+-----------------------------------------------------------------------------
 -- Utilities
---
 
 fi :: (Integral a, Num b) => a -> b
 fi = fromIntegral
 {-# INLINE fi #-}
 
---
+
+-----------------------------------------------------------------------------
 -- FFI
---
 
 type Off = (#type off_t)
 type SSize = (#type ssize_t)
