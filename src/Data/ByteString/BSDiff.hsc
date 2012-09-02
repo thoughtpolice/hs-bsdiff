@@ -115,6 +115,7 @@ bspatch :: FilePath -- ^ Old file
         -> IO ()
 bspatch = bspatch' id
 
+
 -----------------------------------------------------------------------------
 -- Extended file interface
 
@@ -148,6 +149,7 @@ bspatch' f old pat new = do
   o <- S.readFile old
   p <- S.readFile pat
   maybe (return ()) (S.writeFile new . f) (patch o p)
+
 
 -----------------------------------------------------------------------------
 -- Utilities
