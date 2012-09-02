@@ -5,8 +5,8 @@ module Main
 import Test.QuickCheck
 import Test.HUnit
 
+import Data.ByteString
 import Data.ByteString.BSDiff
-import qualified Text.Search.Whistlepig.IO as IO
 
 main :: IO ()
 main = hspec $ do
