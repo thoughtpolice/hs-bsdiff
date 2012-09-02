@@ -38,13 +38,13 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bspatch/bspatch.c,v 1.1 2005/08/06 01:59:
 
 /*
   Patch file format:
-  0	8	"BSDIFF40"
-  8	8	X
-  16	8	Y
-  24	8	sizeof(newfile)
-  32	X	control block
-  32+X	Y	diff block
-  32+X+Y	???	extra block
+  0        8       "BSDIFF40"
+  8        8       X
+  16       8       Y
+  24       8       sizeof(newfile)
+  32       X       control block
+  32+X     Y       diff block
+  32+X+Y   ???     extra block
   with control block a set of triples (x,y,z) meaning "add x bytes
   from oldfile to x bytes from the diff block; copy y bytes from the
   extra block; seek forwards in oldfile by z bytes".
@@ -130,7 +130,7 @@ int bspatch(u_char* old,   ssize_t   oldsize,
     /* Add old data to diff string */
     for(i=0;i<ctrl[0];i++)
       if((oldpos+i>=0) && (oldpos+i<oldsize))
-	new[newpos+i]+=old[oldpos+i];
+        new[newpos+i]+=old[oldpos+i];
 
     /* Adjust pointers */
     newpos+=ctrl[0];

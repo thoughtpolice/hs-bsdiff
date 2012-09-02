@@ -48,14 +48,14 @@ static void split(off_t *I,off_t *V,off_t start,off_t len,off_t h)
     for(k=start;k<start+len;k+=j) {
       j=1;x=V[I[k]+h];
       for(i=1;k+i<start+len;i++) {
-	if(V[I[k+i]+h]<x) {
-	  x=V[I[k+i]+h];
-	  j=0;
-	};
-	if(V[I[k+i]+h]==x) {
-	  tmp=I[k+j];I[k+j]=I[k+i];I[k+i]=tmp;
-	  j++;
-	};
+        if(V[I[k+i]+h]<x) {
+          x=V[I[k+i]+h];
+          j=0;
+        };
+        if(V[I[k+i]+h]==x) {
+          tmp=I[k+j];I[k+j]=I[k+i];I[k+i]=tmp;
+          j++;
+        };
       };
       for(i=0;i<j;i++) V[I[k+i]]=k+j-1;
       if(j==1) I[k]=-1;
@@ -123,14 +123,14 @@ static void qsufsort(off_t *I,off_t *V,u_char *old,off_t oldsize)
     len=0;
     for(i=0;i<oldsize+1;) {
       if(I[i]<0) {
-	len-=I[i];
-	i-=I[i];
+        len-=I[i];
+        i-=I[i];
       } else {
-	if(len) I[i-len]=-len;
-	len=V[I[i]]+1-i;
-	split(I,V,i,len,h);
-	i+=len;
-	len=0;
+        if(len) I[i-len]=-len;
+        len=V[I[i]]+1-i;
+        split(I,V,i,len,h);
+        i+=len;
+        len=0;
       };
     };
     if(len) I[i-len]=-len;
@@ -150,7 +150,7 @@ static off_t matchlen(u_char *old,off_t oldsize,u_char *new,off_t newsize)
 }
 
 static off_t search(off_t *I,u_char *old,off_t oldsize,
-		    u_char *new,off_t newsize,off_t st,off_t en,off_t *pos)
+                    u_char *new,off_t newsize,off_t st,off_t en,off_t *pos)
 {
   off_t x,y;
 
@@ -251,15 +251,15 @@ int bsdiff(char* oldf, char* newf, char* patchf)
     err(1, "%s", argv[3]);
 
   /* Header is
-     0	8	 "BSDIFF40"
-     8	8	length of bzip2ed ctrl block
-     16	8	length of bzip2ed diff block
-     24	8	length of new file */
+     0  8        "BSDIFF40"
+     8  8       length of bzip2ed ctrl block
+     16 8       length of bzip2ed diff block
+     24 8       length of new file */
   /* File is
-     0	32	Header
-     32	??	Bzip2ed ctrl block
-     ??	??	Bzip2ed diff block
-     ??	??	Bzip2ed extra block */
+     0  32      Header
+     32 ??      Bzip2ed ctrl block
+     ?? ??      Bzip2ed diff block
+     ?? ??      Bzip2ed extra block */
   memcpy(header,"BSDIFF40",8);
   offtout(0, header + 8);
   offtout(0, header + 16);
@@ -277,57 +277,57 @@ int bsdiff(char* oldf, char* newf, char* patchf)
 
     for(scsc=scan+=len;scan<newsize;scan++) {
       len=search(I,old,oldsize,new+scan,newsize-scan,
-		 0,oldsize,&pos);
+                 0,oldsize,&pos);
 
       for(;scsc<scan+len;scsc++)
-	if((scsc+lastoffset<oldsize) &&
-	   (old[scsc+lastoffset] == new[scsc]))
-	  oldscore++;
+        if((scsc+lastoffset<oldsize) &&
+           (old[scsc+lastoffset] == new[scsc]))
+          oldscore++;
 
       if(((len==oldscore) && (len!=0)) ||
-	 (len>oldscore+8)) break;
+         (len>oldscore+8)) break;
 
       if((scan+lastoffset<oldsize) &&
-	 (old[scan+lastoffset] == new[scan]))
-	oldscore--;
+         (old[scan+lastoffset] == new[scan]))
+        oldscore--;
     };
 
     if((len!=oldscore) || (scan==newsize)) {
       s=0;Sf=0;lenf=0;
       for(i=0;(lastscan+i<scan)&&(lastpos+i<oldsize);) {
-	if(old[lastpos+i]==new[lastscan+i]) s++;
-	i++;
-	if(s*2-i>Sf*2-lenf) { Sf=s; lenf=i; };
+        if(old[lastpos+i]==new[lastscan+i]) s++;
+        i++;
+        if(s*2-i>Sf*2-lenf) { Sf=s; lenf=i; };
       };
 
       lenb=0;
       if(scan<newsize) {
-	s=0;Sb=0;
-	for(i=1;(scan>=lastscan+i)&&(pos>=i);i++) {
-	  if(old[pos-i]==new[scan-i]) s++;
-	  if(s*2-i>Sb*2-lenb) { Sb=s; lenb=i; };
-	};
+        s=0;Sb=0;
+        for(i=1;(scan>=lastscan+i)&&(pos>=i);i++) {
+          if(old[pos-i]==new[scan-i]) s++;
+          if(s*2-i>Sb*2-lenb) { Sb=s; lenb=i; };
+        };
       };
 
       if(lastscan+lenf>scan-lenb) {
-	overlap=(lastscan+lenf)-(scan-lenb);
-	s=0;Ss=0;lens=0;
-	for(i=0;i<overlap;i++) {
-	  if(new[lastscan+lenf-overlap+i]==
-	     old[lastpos+lenf-overlap+i]) s++;
-	  if(new[scan-lenb+i]==
-	     old[pos-lenb+i]) s--;
-	  if(s>Ss) { Ss=s; lens=i+1; };
-	};
+        overlap=(lastscan+lenf)-(scan-lenb);
+        s=0;Ss=0;lens=0;
+        for(i=0;i<overlap;i++) {
+          if(new[lastscan+lenf-overlap+i]==
+             old[lastpos+lenf-overlap+i]) s++;
+          if(new[scan-lenb+i]==
+             old[pos-lenb+i]) s--;
+          if(s>Ss) { Ss=s; lens=i+1; };
+        };
 
-	lenf+=lens-overlap;
-	lenb-=lens;
+        lenf+=lens-overlap;
+        lenb-=lens;
       };
 
       for(i=0;i<lenf;i++)
-	db[dblen+i]=new[lastscan+i]-old[lastpos+i];
+        db[dblen+i]=new[lastscan+i]-old[lastpos+i];
       for(i=0;i<(scan-lenb)-(lastscan+lenf);i++)
-	eb[eblen+i]=new[lastscan+lenf+i];
+        eb[eblen+i]=new[lastscan+lenf+i];
 
       dblen+=lenf;
       eblen+=(scan-lenb)-(lastscan+lenf);
@@ -335,17 +335,17 @@ int bsdiff(char* oldf, char* newf, char* patchf)
       offtout(lenf,buf);
       BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
       if (bz2err != BZ_OK)
-	errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
+        errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
 
       offtout((scan-lenb)-(lastscan+lenf),buf);
       BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
       if (bz2err != BZ_OK)
-	errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
+        errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
 
       offtout((pos-lenb)-(lastpos+lenf),buf);
       BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
       if (bz2err != BZ_OK)
-	errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
+        errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
 
       lastscan=scan-lenb;
       lastpos=pos-lenb;
