@@ -63,7 +63,8 @@ diff _old _new
   | otherwise   = unsafePerformIO $
       U.unsafeUseAsCStringLen _old $ \(oldp, olds) ->
       U.unsafeUseAsCStringLen _new $ \(newp, news) -> do
-        r <- SI.createAndTrim (fi news) $ \out -> do
+        let sz = fi (news + olds + 400) -- Just to be safe
+        r <- SI.createAndTrim sz $ \out -> do
           res <- c_bsdiff oldp (fi olds) newp (fi news) out
           return $ if (res <= 0) then 0 else res
         if (S.null r) then return Nothing else return (Just r)
