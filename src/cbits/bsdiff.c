@@ -28,17 +28,27 @@
 __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c,v 1.1 2005/08/06 01:59:05 cperciva Exp $");
 #endif
 
-#include <sys/types.h>
-
-#include <bzlib.h>
-#include <err.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
-#include <unistd.h>
+#include <err.h>
+
+#include "bsdiff.h"
 
 #define MIN(x,y) (((x)<(y)) ? (x) : (y))
+
+/* Header is
+   0  8        "BSDIFF40"
+   8  8       length of bzip2ed ctrl block
+   16 8       length of bzip2ed diff block
+   24 8       length of new file */
+/* File is
+   0  32      Header
+   32 ??      Bzip2ed ctrl block
+   ?? ??      Bzip2ed diff block
+   ?? ??      Bzip2ed extra block */
+
 
 static void split(off_t *I,off_t *V,off_t start,off_t len,off_t h)
 {
@@ -193,11 +203,11 @@ static void offtout(off_t x,u_char *buf)
   if(x<0) buf[7]|=0x80;
 }
 
-int bsdiff(char* oldf, char* newf, char* patchf)
+int bsdiff(u_char* old, off_t oldsize,
+           u_char* new, off_t newsize,
+           u_char* patch)
 {
   int fd;
-  u_char *old,*new;
-  off_t oldsize,newsize;
   off_t *I,*V;
   off_t scan,pos,len;
   off_t lastscan,lastpos,lastoffset;
@@ -209,22 +219,12 @@ int bsdiff(char* oldf, char* newf, char* patchf)
   u_char *db,*eb;
   u_char buf[8];
   u_char header[32];
-  FILE * pf;
-  BZFILE * pfbz2;
-  int bz2err;
+  u_char *fileblock;
 
-  int argc = 4;
-  char* argv[] = { NULL, oldf, newf, patchf };
+  off_t ctrllen;
 
   /* Allocate oldsize+1 bytes instead of oldsize bytes to ensure
      that we never try to malloc(0) and get a NULL pointer */
-  if(((fd=open(argv[1],O_RDONLY,0))<0) ||
-     ((oldsize=lseek(fd,0,SEEK_END))==-1) ||
-     ((old=malloc(oldsize+1))==NULL) ||
-     (lseek(fd,0,SEEK_SET)!=0) ||
-     (read(fd,old,oldsize)!=oldsize) ||
-     (close(fd)==-1)) err(1,"%s",argv[1]);
-
   if(((I=malloc((oldsize+1)*sizeof(off_t)))==NULL) ||
      ((V=malloc((oldsize+1)*sizeof(off_t)))==NULL)) err(1,NULL);
 
@@ -234,42 +234,23 @@ int bsdiff(char* oldf, char* newf, char* patchf)
 
   /* Allocate newsize+1 bytes instead of newsize bytes to ensure
      that we never try to malloc(0) and get a NULL pointer */
-  if(((fd=open(argv[2],O_RDONLY,0))<0) ||
-     ((newsize=lseek(fd,0,SEEK_END))==-1) ||
-     ((new=malloc(newsize+1))==NULL) ||
-     (lseek(fd,0,SEEK_SET)!=0) ||
-     (read(fd,new,newsize)!=newsize) ||
-     (close(fd)==-1)) err(1,"%s",argv[2]);
-
   if(((db=malloc(newsize+1))==NULL) ||
      ((eb=malloc(newsize+1))==NULL)) err(1,NULL);
   dblen=0;
   eblen=0;
 
-  /* Create the patch file */
-  if ((pf = fopen(argv[3], "w")) == NULL)
-    err(1, "%s", argv[3]);
-
-  /* Header is
-     0  8        "BSDIFF40"
-     8  8       length of bzip2ed ctrl block
-     16 8       length of bzip2ed diff block
-     24 8       length of new file */
-  /* File is
-     0  32      Header
-     32 ??      Bzip2ed ctrl block
-     ?? ??      Bzip2ed diff block
-     ?? ??      Bzip2ed extra block */
+  /* Write initial header */
   memcpy(header,"BSDIFF40",8);
   offtout(0, header + 8);
   offtout(0, header + 16);
   offtout(newsize, header + 24);
-  if (fwrite(header, 32, 1, pf) != 1)
-    err(1, "fwrite(%s)", argv[3]);
+  memcpy(patch, header, 32);
+
+  /* Set up initial pointers */
+  fileblock = patch + 32;
+  ctrllen = 0;
 
   /* Compute the differences, writing ctrl as we go */
-  if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
-    errx(1, "BZ2_bzWriteOpen, bz2err = %d", bz2err);
   scan=0;len=0;
   lastscan=0;lastpos=0;lastoffset=0;
   while(scan<newsize) {
@@ -333,73 +314,43 @@ int bsdiff(char* oldf, char* newf, char* patchf)
       eblen+=(scan-lenb)-(lastscan+lenf);
 
       offtout(lenf,buf);
-      BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
-      if (bz2err != BZ_OK)
-        errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
+      memcpy(fileblock, buf, 8);
+      fileblock += 8; ctrllen += 8;
 
       offtout((scan-lenb)-(lastscan+lenf),buf);
-      BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
-      if (bz2err != BZ_OK)
-        errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
+      memcpy(fileblock, buf, 8);
+      fileblock += 8; ctrllen += 8;
 
       offtout((pos-lenb)-(lastpos+lenf),buf);
-      BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
-      if (bz2err != BZ_OK)
-        errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
+      memcpy(fileblock, buf, 8);
+      fileblock += 8; ctrllen += 8;
 
       lastscan=scan-lenb;
       lastpos=pos-lenb;
       lastoffset=pos-scan;
     };
   };
-  BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL);
-  if (bz2err != BZ_OK)
-    errx(1, "BZ2_bzWriteClose, bz2err = %d", bz2err);
 
-  /* Compute size of compressed ctrl data */
-  if ((len = ftello(pf)) == -1)
-    err(1, "ftello");
-  offtout(len-32, header + 8);
+  /* Write size of ctrl data */
+  offtout(ctrllen-32, header + 8);
 
-  /* Write compressed diff data */
-  if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
-    errx(1, "BZ2_bzWriteOpen, bz2err = %d", bz2err);
-  BZ2_bzWrite(&bz2err, pfbz2, db, dblen);
-  if (bz2err != BZ_OK)
-    errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
-  BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL);
-  if (bz2err != BZ_OK)
-    errx(1, "BZ2_bzWriteClose, bz2err = %d", bz2err);
+  /* Write diff data */
+  memcpy(fileblock, db, dblen);
+  fileblock += dblen;
+  /* Write size of diff data */
+  offtout(dblen - len, header + 16);
 
-  /* Compute size of compressed diff data */
-  if ((newsize = ftello(pf)) == -1)
-    err(1, "ftello");
-  offtout(newsize - len, header + 16);
+  /* Write extra data */
+  memcpy(fileblock, eb, eblen);
+  fileblock += eblen;
 
-  /* Write compressed extra data */
-  if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
-    errx(1, "BZ2_bzWriteOpen, bz2err = %d", bz2err);
-  BZ2_bzWrite(&bz2err, pfbz2, eb, eblen);
-  if (bz2err != BZ_OK)
-    errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
-  BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL);
-  if (bz2err != BZ_OK)
-    errx(1, "BZ2_bzWriteClose, bz2err = %d", bz2err);
-
-  /* Seek to the beginning, write the header, and close the file */
-  if (fseeko(pf, 0, SEEK_SET))
-    err(1, "fseeko");
-  if (fwrite(header, 32, 1, pf) != 1)
-    err(1, "fwrite(%s)", argv[3]);
-  if (fclose(pf))
-    err(1, "fclose");
+  /* Write the final header */
+  memcpy(patch, header, 32);
 
   /* Free the memory we used */
   free(db);
   free(eb);
   free(I);
-  free(old);
-  free(new);
 
   return 0;
 }

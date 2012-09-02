@@ -1,7 +1,7 @@
 #ifndef _BSPATCH_H_
 #define _BSPATCH_H_
 
-typedef unsigned char u_char;
+typedef uint8_t u_char;
 
 bool valid_header(unsigned char* patchf);
 ssize_t bspatch_newsize(unsigned char* patch);
