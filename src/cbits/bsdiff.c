@@ -249,7 +249,7 @@ int bsdiff(u_char* old, off_t oldsize,
   ctrllen = 0;
 
   /* Compute the differences, writing ctrl as we go */
-  scan=0;len=0;
+  scan=0;len=0;pos=0;
   lastscan=0;lastpos=0;lastoffset=0;
   while(scan<newsize) {
     oldscore=0;
