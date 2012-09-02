@@ -2,6 +2,7 @@ module Main
        ( main -- :: IO ()
        ) where
 
+import Test.Hspec
 import Test.QuickCheck
 
 import Data.ByteString
