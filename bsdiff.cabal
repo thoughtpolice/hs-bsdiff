@@ -4,9 +4,11 @@ synopsis:            Haskell bindings to Bsdiff
 description:
   @bsdiff@ is a tool for creating/applying patches to binary files.
   .
-  These are the complete Haskell bindings. Based on bsdiff v4.3.
+  These are the complete Haskell bindings. They're based on minibsdiff,
+  which is a portable derivative of bsdiff v4.3. See
+  <http://github.com/thoughtpolice/minibsdiff>
   .
-  Please see the homepage for more information: <http://www.daemonology.net/bsdiff/>
+  Please see the bsdiff homepage for more information: <http://www.daemonology.net/bsdiff/>
 homepage:            http://thoughtpolice.github.com/hs-bsdiff
 bug-reports:         http://github.com/thoughtpolice/hs-bsdiff/issues
 license:             BSD3

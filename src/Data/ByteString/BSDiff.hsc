@@ -8,10 +8,13 @@
 -- Stability   : experimental
 -- Portability : GHC probably
 --
--- This module exports a simple 'ByteString' based interface to
--- bsdiff, which allows you to create and apply binary patches to
--- arbitrary files (for example, if you want to do incremental software
--- updates to users.)
+-- This module exports some simple interfaces to bsdiff, which allows you to
+-- create and apply binary patches to arbitrary 'ByteString's or files (for
+-- example, if you want to do incremental software updates to users.)
+--
+-- The interface is based on minibsdiff, which is a portable derivative of
+-- bsdiff v4.3.  See <http://github.com/thoughtpolice/minibsdiff> for
+-- information.
 --
 module Data.ByteString.BSDiff
        ( -- * ByteString interface
