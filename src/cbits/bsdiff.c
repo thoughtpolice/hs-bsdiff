@@ -206,7 +206,6 @@ int bsdiff(u_char* old, off_t oldsize,
            u_char* new, off_t newsize,
            u_char* patch)
 {
-  int fd;
   off_t *I,*V;
   off_t scan,pos,len;
   off_t lastscan,lastpos,lastoffset;
