@@ -6,10 +6,10 @@ software.
 These are the awesome Haskell bindings, based on [minibsdiff][], a slimmed down
 version of bsdiff v4.3.
 
-This package also includes a reimplementation of @bsdiff/bspatch@, called
-@bspatcher@, which demonstrates how to use the library and offers several
+This package also includes a reimplementation of `bsdiff/bspatch`, called
+`bspatcher`, which demonstrates how to use the library and offers several
 compression modes as opposed to just bzlib like the standard bsdiff. If you
-want to enable snappy support in @bspatcher@, install with the @-fsnappy@ flag.
+want to enable snappy support in `bspatcher`, install with the `-fsnappy` flag.
 
 [travis-ci.org](http://travis-ci.org) results: [![Build Status](https://secure.travis-ci.org/thoughtpolice/hs-bsdiff.png?branch=master)](http://travis-ci.org/thoughtpolice/hs-bsdiff)
 
