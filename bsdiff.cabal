@@ -44,6 +44,10 @@ flag no-exe
   description: Disable compilation of bspatcher utility
   default: False
 
+flag snappy
+  description: Enable snappy compression (requires external library)
+  default: False
+
 library
   exposed-modules:
     Data.ByteString.BSDiff
@@ -72,7 +76,11 @@ executable bspatcher
     base >= 4,
     bytestring,
     bsdiff,
-    lz4, zlib, bzlib, quicklz, snappy
+    lz4, zlib, bzlib, quicklz
+
+  if flag(snappy)
+    cpp-options:   -DSNAPPY
+    build-depends: snappy
 
   if flag(no-exe)
     buildable: False

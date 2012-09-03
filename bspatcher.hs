@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Main
        ( main -- :: IO ()
        ) where
@@ -13,7 +14,9 @@ import qualified Codec.Compression.Zlib as Zlib
 import qualified Codec.Compression.GZip as GZip
 import qualified Codec.Compression.BZip as BZip
 import qualified Codec.Compression.QuickLZ as QuickLZ
+#ifdef SNAPPY
 import qualified Codec.Compression.Snappy as Snappy
+#endif
 
 
 main :: IO ()
@@ -29,7 +32,9 @@ main = getArgs >>= go
         go ("-gzip":xs)   = patcher (lift $ GZip.compressWith gbest) xs
         go ("-bz2":xs)    = patcher (lift BZip.compress) xs
         go ("-qlz":xs)    = patcher (Just . QuickLZ.compress) xs
+#ifdef SNAPPY
         go ("-snappy":xs) = patcher (Just . Snappy.compress) xs
+#endif
         go _                  = usage
 
         patcher f ["gen",i,o,p] = bsdiff' f i o p
@@ -54,5 +59,8 @@ usage = putStrLn $ "usage:\n\n" ++
                    "\t-zlib\t -- zlib compression\n" ++
                    "\t-gzip\t -- gzip compression\n" ++
                    "\t-bz2\t -- bzip compression\n" ++
-                   "\t-qlz\t -- quicklz compression\n" ++
-                   "\t-snappy\t -- snappy compression\n"
+                   "\t-qlz\t -- quicklz compression\n"
+#ifdef SNAPPY
+                   ++ "\t-snappy\t -- snappy compression\n"
+#endif
+
