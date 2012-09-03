@@ -42,7 +42,10 @@ See [AUTHORS.txt](https://raw.github.com/thoughtpolice/hs-bsdiff/master/AUTHORS.
 
 # License
 
-BSD3. See `LICENSE.txt` for terms of copyright and redistribution.
+The library is BSD3. However, the `bspatcher` executable is under the GPLv2 (or
+later,) the same as [QuickLZ](http://quicklz.com) itself and [my Haskell
+binding](http://hackage.haskell.org/package/quicklz) since it uses it by
+default. See `LICENSE.txt` for terms of copyright and redistribution.
 
 [bsdiff]: http://www.daemonology.net/bsdiff/
 [main page]: http://thoughtpolice.github.com/hs-bsdiff
