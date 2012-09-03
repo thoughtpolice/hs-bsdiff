@@ -31,10 +31,11 @@ tested-with:         GHC == 7.0.4,
 extra-source-files:
   AUTHORS.txt
   README.md
-  examples/*.hs
   tests/*.hs
   bench/*.hs
-  src/cbits/test.c
+  src/cbits/*.txt, src/cbits/*.md
+  src/cbits/*.h, src/cbits/test.c
+  src/cbits/makefile
 
 source-repository head
   type: git
