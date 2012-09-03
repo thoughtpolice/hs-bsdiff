@@ -9,8 +9,10 @@ description:
   <http://github.com/thoughtpolice/minibsdiff>
   .
   This package also includes a reimplementation of @bsdiff/bspatch@, called
-  @bspatcher@, which demonstrates how to use the library and uses lz4
-  compression as opposed to bzip (just for demonstration.)
+  @bspatcher@, which demonstrates how to use the library and offers several
+  compression modes as opposed to just bzlib like the standard bsdiff. If you
+  want to enable snappy support in @bspatcher@, install with the @-fsnappy@
+  flag.
   .
   Please see the bsdiff homepage for more information: <http://www.daemonology.net/bsdiff/>
 homepage:            http://thoughtpolice.github.com/hs-bsdiff
