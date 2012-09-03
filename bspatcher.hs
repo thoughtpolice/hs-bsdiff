@@ -19,7 +19,7 @@ main = getArgs >>= go
 usage :: IO ()
 usage = putStrLn $ "usage:\n\n" ++
                    "Generate patch:\n" ++
-                   "\t$ ex1 [-c] gen <v1> <v2> <patch>\n" ++
+                   "\t$ bspatcher [-c] gen <v1> <v2> <patch>\n" ++
                    "Apply patch:\n" ++
-                   "\t$ ex1 [-c] app <v1> <patch> <v2>\n\n" ++
-                   "The '-c' option enables lz4 compression"
+                   "\t$ bspatcher [-c] app <v1> <patch> <v2>\n\n" ++
+                   "The '-c' option enables lz4 compression."

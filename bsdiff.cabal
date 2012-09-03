@@ -8,6 +8,9 @@ description:
   which is a portable derivative of bsdiff v4.3. See
   <http://github.com/thoughtpolice/minibsdiff>
   .
+  This package also includes a re-creation of bsdiff, called @bspatcher@, which demonstrates
+  how to use the library and uses LZ4 compression as opposed to bzip (just for demonstration.)
+  .
   Please see the bsdiff homepage for more information: <http://www.daemonology.net/bsdiff/>
 homepage:            http://thoughtpolice.github.com/hs-bsdiff
 bug-reports:         http://github.com/thoughtpolice/hs-bsdiff/issues
@@ -36,6 +39,10 @@ source-repository head
   type: git
   location: https://github.com/thoughtpolice/hs-bsdiff.git
 
+flag no-exe
+  description: Disable compilation of bspatcher utility
+  default: False
+
 library
   exposed-modules:
     Data.ByteString.BSDiff
@@ -54,8 +61,25 @@ library
 
   ghc-options:        -Wall -O2 -funbox-strict-fields
                       -fwarn-tabs
-  default-extensions: CPP
+  default-extensions: CPP, ForeignFunctionInterface
   default-language:   Haskell2010
+
+executable bspatcher
+  main-is: bspatcher.hs
+
+  build-depends:
+    base >= 4,
+    bytestring,
+    bsdiff,
+    lz4
+
+  if flag(no-exe)
+    buildable: False
+
+  hs-source-dirs:   . src
+  ghc-options:      -Wall -O2 -funbox-strict-fields
+                    -fwarn-tabs
+  default-language: Haskell2010
 
 test-suite properties
   hs-source-dirs: tests
