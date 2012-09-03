@@ -1,7 +1,6 @@
 *.o
 *.hi
 *~
-examples/ex1
 /.hsenv*
 /dist*
 .sublime-*
