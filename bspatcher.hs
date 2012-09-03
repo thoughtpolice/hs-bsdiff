@@ -25,8 +25,8 @@ main = getArgs >>= go
         go ["app",o,p,n]      = bspatch o p n
 
         go ("-lz4":xs)    = patcher LZ4.compressPlusHC xs
-        go ("-zlib":xs)   = patcher (lift Zlib.compress) xs
-        go ("-gzip":xs)   = patcher (lift GZip.compress) xs
+        go ("-zlib":xs)   = patcher (lift $ Zlib.compressWith zbest) xs
+        go ("-gzip":xs)   = patcher (lift $ GZip.compressWith gbest) xs
         go ("-bz2":xs)    = patcher (lift BZip.compress) xs
         go ("-qlz":xs)    = patcher (Just . QuickLZ.compress) xs
         go ("-snappy":xs) = patcher (Just . Snappy.compress) xs
@@ -35,6 +35,9 @@ main = getArgs >>= go
         patcher f ["gen",i,o,p] = bsdiff' f i o p
         patcher f ["app",o,p,n] = bspatch' f o p n
         patcher _ _             = usage
+
+        zbest = Zlib.defaultCompressParams { Zlib.compressLevel = Zlib.bestCompression }
+        gbest = GZip.defaultCompressParams { GZip.compressLevel = GZip.bestCompression }
 
 -- Used to lift the stream compressors from lazy to strict.
 lift :: (L.ByteString -> L.ByteString) -> B.ByteString -> Maybe B.ByteString
