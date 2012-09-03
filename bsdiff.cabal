@@ -8,8 +8,9 @@ description:
   which is a portable derivative of bsdiff v4.3. See
   <http://github.com/thoughtpolice/minibsdiff>
   .
-  This package also includes a re-creation of bsdiff, called @bspatcher@, which demonstrates
-  how to use the library and uses LZ4 compression as opposed to bzip (just for demonstration.)
+  This package also includes a reimplementation of @bsdiff/bspatch@, called
+  @bspatcher@, which demonstrates how to use the library and uses lz4
+  compression as opposed to bzip (just for demonstration.)
   .
   Please see the bsdiff homepage for more information: <http://www.daemonology.net/bsdiff/>
 homepage:            http://thoughtpolice.github.com/hs-bsdiff

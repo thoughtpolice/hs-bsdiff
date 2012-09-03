@@ -3,10 +3,14 @@
 [bsdiff][] is a tool for building and applying patches to binary
 software.
 
-These are the awesome Haskell bindings, based on bsdiff v4.3.
+These are the awesome Haskell bindings, based on bsdiff v4.3. Also included is
+a small reimplementation of `bsdiff/bspatch` called `bspatcher` that
+demonstrates how to use the API and uses [lz4](http://code.google.com/p/lz4)
+for compression.
 
-The `src/cbits` directory contains a copy of [minibsdiff](http://github.com/thoughtpolice/minibsdiff)
-which is the underlying API. You can reuse it however you like.
+The `src/cbits` directory contains a copy of
+[minibsdiff](http://github.com/thoughtpolice/minibsdiff) which is the
+underlying API. You can reuse it however you like.
 
 [travis-ci.org](http://travis-ci.org) results: [![Build Status](https://secure.travis-ci.org/thoughtpolice/hs-bsdiff.png?branch=master)](http://travis-ci.org/thoughtpolice/hs-bsdiff)
 
