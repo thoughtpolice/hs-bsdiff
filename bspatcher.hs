@@ -40,24 +40,34 @@ import qualified Codec.Compression.Snappy as Snappy
 main :: IO ()
 main = getArgs >>= go
   where go :: [String] -> IO ()
-        go ["-h"]             = usage
+        go ["-h"]         = usage
 
-        go ["gen",i,o,p]      = bsdiff i o p
-        go ["app",o,p,n]      = bspatch o p n
+        go ["gen",i,o,p]  = bsdiff i o p
+        go ["app",o,p,n]  = bspatch o p n
 
-        go ("-lz4":xs)    = patcher LZ4.compressPlusHC xs
-        go ("-zlib":xs)   = patcher (lift $ Zlib.compressWith zbest) xs
-        go ("-gzip":xs)   = patcher (lift $ GZip.compressWith gbest) xs
-        go ("-bz2":xs)    = patcher (lift BZip.compress) xs
-        go ("-qlz":xs)    = patcher (Just . QuickLZ.compress) xs
+        go ("-lz4":xs)    = patcher lz4 xs
+        go ("-zlib":xs)   = patcher zlib xs
+        go ("-gzip":xs)   = patcher gzip xs
+        go ("-bz2":xs)    = patcher bz2 xs
+        go ("-qlz":xs)    = patcher qlz xs
 #ifdef SNAPPY
-        go ("-snappy":xs) = patcher (Just . Snappy.compress) xs
+        go ("-snappy":xs) = patcher snappy xs
 #endif
-        go _                  = usage
+        go _              = usage
 
-        patcher f ["gen",i,o,p] = bsdiff' f i o p
-        patcher f ["app",o,p,n] = bspatch' f o p n
-        patcher _ _             = usage
+        patcher (f,_) ["gen",i,o,p] = bsdiff' f i o p
+        patcher (_,g) ["app",o,p,n] = bspatch' g o p n
+        patcher _ _                 = usage
+
+        -- These define our compressors and our decompressors.
+        lz4  = (LZ4.compressPlusHC, LZ4.decompressPlusHC)
+        zlib = (lift (Zlib.compressWith zbest), lift Zlib.decompress)
+        gzip = (lift (GZip.compressWith gbest), lift GZip.decompress)
+        bz2  = (lift BZip.compress, lift BZip.decompress)
+        qlz  = (Just . QuickLZ.compress, Just . QuickLZ.decompress)
+#ifdef SNAPPY
+        snappy = (Just . Snappy.compress, Just . Snappy.decompress)
+#endif
 
         zbest = Zlib.defaultCompressParams { Zlib.compressLevel = Zlib.bestCompression }
         gbest = GZip.defaultCompressParams { GZip.compressLevel = GZip.bestCompression }
