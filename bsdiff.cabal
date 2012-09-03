@@ -72,7 +72,7 @@ executable bspatcher
     base >= 4,
     bytestring,
     bsdiff,
-    lz4
+    lz4, zlib, bzlib, quicklz, snappy
 
   if flag(no-exe)
     buildable: False
